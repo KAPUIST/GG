@@ -9,6 +9,7 @@ import PhotoModal from "../components/Modals/PhotoModal";
 import type { RootState } from "../store";
 import PhotoUploader from "../components/PhotoUploader";
 import CalendarRecord from "../components/CalendarRecord";
+import DeleteModal from "../components/Modals/DeleteModal";
 
 import {
   axios_Get_DetailPosts,
@@ -20,7 +21,15 @@ import {
 } from "../axios";
 
 const FormData = require("form-data");
-
+function showTime(duration: number) {
+  let seconds: number | string = Math.floor(duration % 60);
+  let minutes: number | string = Math.floor((duration / 60) % 60);
+  let hours: number | string = Math.floor((duration / (60 * 60)) % 24);
+  hours = hours < 10 ? "0" + hours : hours;
+  minutes = minutes < 10 ? "0" + minutes : minutes;
+  seconds = seconds < 10 ? "0" + seconds : seconds;
+  return hours + "시간 " + minutes + "분 " + seconds + "초";
+}
 interface RecordType {
   genre: string;
   weight: number;
@@ -29,43 +38,120 @@ interface RecordType {
 }
 
 export const Main = styled.div`
-  border: 3px solid green;
-  padding: 10px;
-  margin: 5rem 0rem;
+  //border: 3px solid greens;
+  margin: auto;
+
   /* 화면 중앙으로 만들기 */
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
   min-height: 90vh;
-  width: 70%;
-  flex-direction: column;
+  width: 40%;
+
   > div {
     display: flex;
     width: 100%;
   }
-  > #detial-container-up {
-    border: 1px solid gray;
-
+  > #detail-container-up {
+    //border: 1px solid gray;
     display: flex;
-    flex: 2 0 auto;
+    min-width: 20rem;
     flex-direction: column;
-    > #detial-container-up-up {
+    > #detail-title {
+      font-size: 1.5rem;
+      border-bottom: 1px solid grey;
+    }
+    > #detail-image {
+      > .post-date {
+        padding-left: 1rem;
+        padding-bottom: 1rem;
+      }
+      > .post-image {
+        width: 100%;
+      }
+    }
+
+    > #detail-container-up-up {
       display: flex;
       flex-direction: row;
       justify-content: space-between;
+      padding-top: 3rem;
+      > #detail-userinfo {
+        padding: 1rem;
+        display: flex;
+        > .user-image {
+          border-radius: 4rem;
+        }
+        > .user-nickname {
+          padding: 1rem;
+        }
+      }
+      > .detail-button {
+        display: flex;
+
+        > .delete-button {
+          > .fa-trash-can {
+            margin-top: 1rem;
+            font-size: 1.5rem;
+            padding: 0.5rem;
+            cursor: pointer;
+          }
+          > .fa-trash-can:hover {
+            color: red;
+          }
+        }
+
+        > .edit-button {
+          > .fa-pen-to-square {
+            margin-top: 1rem;
+            font-size: 1.5rem;
+            padding: 0.5rem;
+            cursor: pointer;
+          }
+          > .fa-pen-to-square:hover {
+            color: red;
+          }
+        }
+      }
     }
   }
-  > #detial-container-down {
+  > #detail-container-down {
     border: 1px solid gray;
-
-    flex: 1 0 auto;
+    min-width: 20rem;
+    > .detail-exInfo {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      > .user-exInfo {
+        display: flex;
+        flex-direction: column;
+      }
+    }
   }
-  > #detial-container-comment {
+  > #detail-container-comment {
     border: 1px solid gray;
     display: flex;
     flex-direction: column;
-    /* width: auto; */
-    flex: 2 0 auto;
+    min-width: 20rem;
+
+    > .heart {
+      > .before-like {
+        > .fa-heart {
+          color: grey;
+          font-size: 1.3rem;
+          padding: 0.5rem;
+          cursor: pointer;
+        }
+      }
+      > .after-like {
+        > .fa-heart {
+          color: red;
+          font-size: 1.3rem;
+          padding: 0.5rem;
+          cursor: pointer;
+        }
+      }
+    }
     > #detail-Comment-input {
       display: flex;
       /* > #div-input {
@@ -190,7 +276,21 @@ export default function Detail() {
         });
     });
   };
+  const handleModifyPost = () => {
+    setIsModify(!isModify);
+    setTitleContent(postInfo.title);
+    setTextContent(postInfo.info);
+    setBodyPart(postInfo.body_part);
+    // setPhoto(postInfo.users.image);
+    setDifficult(postInfo.difficult);
+    setTotalTime(postInfo.total_time);
+    setExInfo(postInfo.exerciseInfo.id);
+  };
 
+  const [deleteModal, setDeleteModal] = useState(false);
+  const openDeleteModal = () => {
+    setDeleteModal(!deleteModal);
+  };
   const handlePostDelete = () => {
     console.log("포스트삭제");
     axios_Delete_Post(postId, user.accessToken).then(() => {
@@ -208,12 +308,20 @@ export default function Detail() {
   // console.log("isModify: ", isModify);
   // let shareRecords = postInfo.exerciseInfo.ex_record;
   // console.log("shareRecords :", shareRecords);
+  const numToStar = (num: number) => {
+    if (num === 0) return "☆";
+    let star = "";
+    for (let i = 0; i < num; i++) {
+      star += "★";
+    }
+    return star;
+  };
   return (
     <div id="DetailPage">
       {postInfo ? (
         isModify ? (
           <Main>
-            <div id="detial-container-up">
+            <div id="detail-container-up">
               <div>수정</div>
               <div id="detail-title">
                 <input
@@ -222,12 +330,12 @@ export default function Detail() {
                   onChange={(e) => setTitleContent(e.target.value)}
                 ></input>
               </div>
-              <div id="detial-container-up-up">
+              <div id="detail-container-up-up">
                 <div id="detail-userinfo">
                   <img
                     src={postInfo.users.image}
                     style={{ width: "70px" }}
-                    alt ="user"
+                    alt="user"
                   />
                   <div>{postInfo.users.nickname}</div>
                 </div>
@@ -238,7 +346,11 @@ export default function Detail() {
 
               <div id="detail-image">
                 <div>{postInfo.created_At.split("T")[0]}</div>
-                <PhotoUploader photo={photo} setPhoto={setPhoto} photoUrl={postInfo.image}/>
+                <PhotoUploader
+                  photo={photo}
+                  setPhoto={setPhoto}
+                  photoUrl={postInfo.image}
+                />
                 {/* <img
                   src={postInfo.image}
                   alt="post_image"
@@ -254,19 +366,11 @@ export default function Detail() {
                 ) : null} */}
               </div>
             </div>
-            <div id="detial-container-down">
+            <div id="detail-container-down">
               <div id="detail-exInfo">
-                팔굽 윈몸 난이도
                 <br />
                 <br />
-                <div>
-                  총 소요시간:{" "}
-                  <input
-                    type="textarea"
-                    value={totalTime}
-                    onChange={(e) => setTotalTime(e.target.value)}
-                  ></input>
-                </div>
+                <div>총 소요시간: {showTime(postInfo.total_time)} </div>
                 <div>
                   난이도 :{" "}
                   <input
@@ -300,75 +404,94 @@ export default function Detail() {
                 </div>
               </div>
             </div>
-            <div id="detial-container-comment"></div>
+            <div id="detail-container-comment"></div>
           </Main>
         ) : (
           <Main>
-            <div id="detial-container-up">
-              <div>완료</div>
+            <div id="detail-container-up">
               <div id="detail-title">{postInfo.title}</div>
-              <div id="detial-container-up-up">
+              <div id="detail-container-up-up">
                 <div id="detail-userinfo">
                   <img
+                    className="user-image"
                     src={postInfo.users.image}
-                    style={{ width: "70px" }}
+                    style={{ width: "50px" }}
                   ></img>
-                  <div>{postInfo.users.nickname}</div>
+                  <div className="user-nickname">{postInfo.users.nickname}</div>
                 </div>
-                <div id="detail-butten">
-                  <button
-                    onClick={() => {
-                      setIsModify(!isModify);
-                      setTitleContent(postInfo.title);
-                      setTextContent(postInfo.info);
-                      setBodyPart(postInfo.body_part);
-                      // setPhoto(postInfo.users.image);
-                      setDifficult(postInfo.difficult);
-                      setTotalTime(postInfo.total_time);
-                      setExInfo(postInfo.exerciseInfo.id);
-                    }}
-                  >
-                    수정
-                  </button>
-                  <button onClick={handlePostDelete}>삭제</button>
-                </div>
+                {postInfo.users.id === user.id ? (
+                  <div className="detail-button">
+                    <div className="edit-button">
+                      <i
+                        className="fa-solid fa-pen-to-square"
+                        onClick={handleModifyPost}
+                      />
+                    </div>
+                    <div className="delete-button">
+                      <i
+                        className="fa-solid fa-trash-can"
+                        onClick={openDeleteModal}
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <div></div>
+                )}
+                {deleteModal ? (
+                  <DeleteModal
+                    setDeleteModal={setDeleteModal}
+                    handlePostDelete={handlePostDelete}
+                  />
+                ) : null}
               </div>
 
               <div id="detail-image">
-                <div>{postInfo.created_At.split("T")[0]}</div>
-                <img src={postInfo.image} style={{ width: "200px" }}></img>
+                <div className="post-date">
+                  {postInfo.created_At.split("T")[0]}
+                </div>
+                <img className="post-image" src={postInfo.image}></img>
               </div>
             </div>
-            <div id="detial-container-down">
-              <div id="detail-exInfo">
-                {postInfo.exerciseInfo.ex_record[0].genre}
-                {/* {postInfo.exerciseInfo !== null ? (
-                  postInfo.exerciseInfo.map(
-                    (record: RecordType, idx: number) => (
-                      <CalendarRecord key={idx} record={record} />
-                    )
-                  )
-                ) : (
-                  <div></div>
-                )} */}
+            <div id="detail-container-down">
+              <div className="detail-exInfo">
+                {console.log("what doyou have?", postInfo)}
+                <div className="user-exInfo">
+                  {postInfo !== null
+                    ? postInfo.exerciseInfo.ex_record.map(
+                        (record: RecordType, idx: number) => (
+                          <CalendarRecord key={idx} record={record} />
+                        )
+                      )
+                    : null}
+                </div>
                 <br />
                 <br />
-                <div>총 소요시간: {postInfo.total_time}</div>
-                <div>난이도 : {postInfo.difficult}</div>
+                <div>총 소요시간: {showTime(postInfo.total_time)} </div>
+                <div>난이도 : {numToStar(postInfo.difficult)}</div>
                 <div>운동부위 : {postInfo.body_part}</div>
                 <div> 소감 :{postInfo.info}</div>
               </div>
             </div>
-            <div id="detial-container-comment">
-              {isLike ? (
-                <button onClick={handleLikeSubmit} style={{ width: "50px" }}>
-                  ❤️
-                </button>
-              ) : (
-                <button onClick={handleLikeSubmit} style={{ width: "50px" }}>
-                  🖤
-                </button>
-              )}
+            <div id="detail-container-comment">
+              <div className="heart">
+                {isLike ? (
+                  <div className="after-like">
+                    <i
+                      className="fa-solid fa-heart"
+                      onClick={handleLikeSubmit}
+                      style={{ width: "50px" }}
+                    />
+                  </div>
+                ) : (
+                  <div className="before-like">
+                    <i
+                      className="fa-solid fa-heart"
+                      onClick={handleLikeSubmit}
+                      style={{ width: "50px" }}
+                    />
+                  </div>
+                )}
+              </div>
 
               <div id="detail-Comment-input">
                 글쓰기
@@ -379,7 +502,7 @@ export default function Detail() {
                   onChange={(e) => setCommentContent(e.target.value)}
                 ></input>
                 <button id="comment-submit-btn" onClick={handleCommentSubmit}>
-                  전송
+                  게시
                 </button>
               </div>
 
@@ -395,14 +518,14 @@ export default function Detail() {
                     </li>
                   ))
                 ) : (
-                  <div>없음</div>
+                  <div>작성된 댓글이 없습니다!</div>
                 )}
               </ul>
             </div>
           </Main>
         )
       ) : (
-        <div>없</div>
+        <div>없음</div>
       )}
     </div>
   );
