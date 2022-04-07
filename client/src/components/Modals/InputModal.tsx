@@ -1,11 +1,8 @@
 import axios from "axios";
 import { useState } from "react";
 import styled from "styled-components";
-import PhotoUploader from "../PhotoUploader";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState, AppDispatch } from "../../store";
-import { EDIT_IMAGE } from "../../reducer/userInfoReducer";
-import { axios_Put_User } from "../../axios";
 
 export const ModalBackdrop = styled.div`
   position: fixed;
@@ -20,7 +17,6 @@ export const ModalBackdrop = styled.div`
 `;
 
 export const ModalContainer = styled.div`
-  height: 15rem;
   text-align: center;
   margin: 120px auto;
 `;
@@ -29,7 +25,7 @@ export const ModalView = styled.div`
   border-radius: 10px;
   background-color: #ffffff;
   width: 310px;
-  height: 20rem;
+  height: 10rem;
   > .desc {
     display: flex;
     flex-direction: column;
@@ -41,44 +37,43 @@ export const ModalView = styled.div`
       margin: 0rem 1rem;
       font-size: large;
     }
-    > .photoUploader-wrapper {
-      margin: 1rem 1rem;
-      height: 200px;
+    > .quit-info {
+      font-size: medium;
+      margin: 0.5rem 0rem;
     }
     > .choice {
-      margin-bottom: 2rem;
       > button {
-        font-size: medium;
+        font-size: small;
         cursor: pointer;
+        background-color: white;
+        border: none;
+        border: solid 2px black;
+        padding: 0.3rem 1rem;
+        border-radius: 20px;
+        margin: 0.5rem;
+        width: 4.5rem;
+      }
+      > button:hover {
         background-color: black;
         color: white;
-        border: none;
-        padding: 0.3rem 1rem;
-        border-radius: 10px;
       }
     }
   }
 `;
 
-interface PhotoModalProps {
-  photo: any;
-  setPhoto: React.Dispatch<any>;
-  setPhotoModal: React.Dispatch<React.SetStateAction<boolean>>;
+interface DeleteModalProps {
+  setIsModal: React.Dispatch<React.SetStateAction<boolean>>;
+  // handlePostDelete: () => void;
+  infoModal: string;
 }
 
-const PhotoModal: React.FC<PhotoModalProps> = ({
-  photo,
-  setPhoto,
-  setPhotoModal,
-}) => {
+const InputModal: React.FC<DeleteModalProps> = ({ setIsModal, infoModal }) => {
   let dispatch: AppDispatch = useDispatch();
   const [isOpen, setIsOpen] = useState(true);
   const openModalHandler = () => {
     setIsOpen(!isOpen);
-    setPhotoModal((cur) => !cur);
+    setIsModal((cur) => !cur);
   };
-
-  console.log(photo,'포토');
 
   let user = useSelector((state: RootState) => state.userInfo.userInfo);
   const localUser = localStorage.getItem("userInfo");
@@ -86,19 +81,8 @@ const PhotoModal: React.FC<PhotoModalProps> = ({
     user = JSON.parse(localUser);
   }
 
-  const handleProfilePhoto = () => {
-    //서버로 바뀐 사진 정보 보내면 됨
-    const formData = new FormData();
-    formData.append("userImage", photo.file[0]);
-    // formData.append("email", photo.file[0]);
-    // formData.append("password", photo.file[0]);
-    // formData.append("nickname", photo.file[0]);
-    // let serverUrl = "http://localhost:4000";
-
-    axios_Put_User(formData, user.accessToken).then((res) => {
-      setPhotoModal((cur) => !cur);
-      dispatch(EDIT_IMAGE(res.data.Data.image));
-    });
+  const handlDelete = () => {
+    // handlePostDelete();
   };
 
   return (
@@ -110,11 +94,10 @@ const PhotoModal: React.FC<PhotoModalProps> = ({
               <span onClick={openModalHandler} className="close-btn">
                 <i className="fa-regular fa-circle-xmark"></i>
               </span>
-              <div className="photoUploader-wrapper">
-                <PhotoUploader photo={photo} setPhoto={setPhoto} photoUrl="" />
-              </div>
+              <div className="quit-info">{infoModal}하시겠습니까?</div>
               <div className="choice">
-                <button onClick={handleProfilePhoto}>선택하기</button>
+                <button onClick={handlDelete}>예</button>
+                <button onClick={openModalHandler}>아니오</button>
               </div>
             </div>
           </ModalView>
@@ -123,5 +106,4 @@ const PhotoModal: React.FC<PhotoModalProps> = ({
     </ModalContainer>
   );
 };
-
-export default PhotoModal;
+export default InputModal;
