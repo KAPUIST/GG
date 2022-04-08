@@ -1,5 +1,5 @@
 /**포스트 상세 페이지**/
-import Swal from "sweetalert2";
+import swal from "sweetalert";
 import Comment from "../components/Comment";
 import { useSelector, useStore } from "react-redux";
 import axios from "axios";
@@ -61,8 +61,7 @@ export const Main = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 40%;
-  min-width: 22rem;
+  max-width: 30rem;
   box-shadow: 0px 3px 10px 0px rgba(0, 0, 0, 0.2);
   > [contenteditable] {
     outline: 0px solid transparent;
@@ -79,21 +78,66 @@ export const Main = styled.div`
 
     > .detail-title {
       padding-top: 1rem;
-      font-size: 1.5rem;
+      padding-bottom: 0.5rem;
+      font-size: x-large;
       border-bottom: 1px solid grey;
       > .edit-title {
-        border: 1px solid #ddd;
+        border: none;
         border-radius: 4px;
         padding: 4px;
         margin: 3px 0;
-        font-size: 14px;
+        font-size: x-large;
         width: 100%;
+        &:focus {
+          outline: 2px solid grey;
+        }
+      }
+    }
+    > .detail-button {
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-end;
+      > .edit-success {
+        margin-top: 1rem;
+        width: 63px;
+        height: 2rem;
+        font-size: small;
+        border-radius: 5px;
+        border: 0px;
+        background-color: grey;
+        color: white;
+        cursor: pointer;
+      }
+      > .delete-button {
+        > .fa-trash-can {
+          margin-top: 1rem;
+          font-size: 1.5rem;
+          padding: 0rem 0.5rem;
+          cursor: pointer;
+        }
+        > .fa-trash-can:hover {
+          color: red;
+        }
+      }
+      > .edit-button {
+        > .fa-pen-to-square {
+          margin-top: 1rem;
+          font-size: 1.5rem;
+          padding: 0rem 0.5rem;
+          cursor: pointer;
+        }
+        > .fa-pen-to-square:hover {
+          color: red;
+        }
       }
     }
     > .detail-image {
+      height: 100%;
       > .post-date {
         padding-left: 1rem;
         padding-bottom: 1rem;
+        color: grey;
+        font-size: small;
       }
       > .post-image {
         width: 100%;
@@ -104,57 +148,35 @@ export const Main = styled.div`
       display: flex;
       flex-direction: row;
       justify-content: space-between;
-      padding-top: 1rem;
       > .detail-userinfo {
-        padding: 1rem;
         display: flex;
-        > .user-image {
-          border-radius: 4rem;
+        align-items: center;
+        padding-left: 0.5rem;
+        > .user-image-wrapper {
+          position: relative;
+          width: 3rem;
+          height: 3rem;
+          border-radius: 50%;
+          overflow: hidden;
+          background-color: white;
+          > .user-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+          }
         }
         > .user-nickname {
           padding: 1rem;
+          font-weight: bold;
         }
       }
-      > .detail-button {
-        display: flex;
-        > .edit-success {
-          margin-top: 1rem;
-          width: 63px;
-          height: 2rem;
-          font-size: small;
-          border-radius: 5px;
-          border: 0px;
-          background-color: #3364eb;
-          color: white;
-
-          cursor: pointer;
-        }
-        > .delete-button {
-          > .fa-trash-can {
-            margin-top: 1rem;
-            font-size: 1.5rem;
-            padding: 0.5rem;
-            cursor: pointer;
-          }
-          > .fa-trash-can:hover {
-            color: red;
-          }
-        }
-
-        > .edit-button {
-          > .fa-pen-to-square {
-            margin-top: 1rem;
-            font-size: 1.5rem;
-            padding: 0.5rem;
-            cursor: pointer;
-          }
-          > .fa-pen-to-square:hover {
-            color: red;
-          }
-        }
+      
       }
     }
-  }
+  
   > .detail-container-down {
     min-width: 20rem;
     > .detail-exInfo {
@@ -162,47 +184,59 @@ export const Main = styled.div`
       display: flex;
       flex-direction: column;
       align-items: flex-start;
-      > .user-exInfo {
-        padding: 1rem;
+      > .user-exInfo-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        > .user-exInfo {
+          padding: 1rem;
+        }
       }
       > .exInfo {
-        padding: 1rem;
+        padding: 0.5rem;
         width: 100%;
         > .exInfo-time-wrapper {
-          padding: 5px;
+          padding-left: 0.5rem;
           display: flex;
           flex-direction: row;
           > .exInfo-time-title {
             width: 6rem;
+            font-weight: bold;
           }
           > .exInfo-time {
             width: 10rem;
           }
         }
         > .exInfo-difficult-container {
+          padding-left: 0.5rem;
           display: flex;
           flex-direction: row;
           justify-content: flex-start;
           align-items: center;
           > .exInfo-difficult-title {
             width: 6rem;
+            font-weight: bold;
           }
           > .exInfo-difficult {
             width: 10rem;
           }
         }
         > .exInfo-bodypart-container {
+          padding-left: 0.5rem;
+          margin-bottom: 0.5rem;
           display: flex;
           flex-direction: row;
           justify-content: flex-start;
           align-items: center;
           > .exInfo-bodypart-title {
             width: 6rem;
+            font-weight: bold;
           }
           > .exInfo-bodypart {
             width: 10rem;
             > select {
-              width: 7.5rem;
+              margin-left: -5px;
+              width: 7.6rem;
               font-size: medium;
               border: none;
               color: black;
@@ -213,24 +247,24 @@ export const Main = styled.div`
           }
         }
         > .exInfo-text {
-          padding-top: 2rem;
-          border-top: solid lightgrey 1px;
+          margin-top: 2rem;
+          padding: 0.5rem;
+          background: #f2f2f2;
+          border-radius: 10px;
         }
-        > div {
+        > .post-info {
           padding: 5px;
-          > select {
-            margin-left: 1rem;
-            font-size: 15px;
-          }
-          > textarea {
+          > .edit-text {
             border: 1px solid #ddd;
-            border-radius: 4px;
-            padding: 4px;
+            border-radius: 5px;
             margin: 3px 0;
-            font-size: 14px;
+            font-size: 16px;
             width: 100%;
             height: 160px;
             resize: none;
+            &:focus {
+              outline: 2px solid grey;
+            }
           }
         }
       }
@@ -238,44 +272,52 @@ export const Main = styled.div`
   }
   > .detail-container-comment {
     // border: 1px solid gray;
+    padding: 0.5rem;
     display: flex;
     flex-direction: column;
     min-width: 20rem;
-
     > .heart {
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-start;
+      align-items: center;
+      font-size: small;
       > .before-like {
+        width:1.6rem;
+        margin-left: 0.5rem;
         > .fa-heart {
           color: grey;
           font-size: 1.3rem;
-          padding: 0.5rem;
           cursor: pointer;
         }
       }
       > .after-like {
+        width:1.6rem;
+        margin-left: 0.5rem;
         > .fa-heart {
           color: red;
           font-size: 1.3rem;
-          padding: 0.5rem;
           cursor: pointer;
         }
       }
     }
     > .detail-Comment-input {
       display: flex;
+      margin-top: 1rem;
+      height: 2rem;
       /* > .div-input {
         border: 3px solid lightgreen;
         width: 50%;
       } */
 
       > button {
-        width: 4rem;
-        font-size: medium;
+        height: 2rem;
+        width: 3rem;
+        font-size: small;
         cursor: pointer;
         border: none;
-        padding: 0.3rem;
-        border-radius: 2px;
         border-radius: 5px;
-        background-color: #3364eb;
+        background-color: grey;
         color: white;
       }
       > .detail-text {
@@ -302,11 +344,8 @@ export default function Detail() {
   if (localUser !== null) {
     user = JSON.parse(localUser);
   }
-  console.log("detail Page");
-  console.log("params postId:", postId);
 
   const [postInfo, setPostInfo] = useState<any>(null);
-  console.log("postInfo:", postInfo);
   const [commentContent, setCommentContent] = useState<string | null | any>("");
   const [like, setLike] = useState<any>("");
   let [isModify, setIsModify] = useState(false);
@@ -328,29 +367,24 @@ export default function Detail() {
   };
 
   useEffect(() => {
-    console.log("detail useEffect");
-    console.log("innerPostId : ", postId);
     if (postId) {
       axios_Get_DetailPosts(postId).then((req) => {
-        console.log("req:", req.data);
         setPostInfo(req.data);
         let likeFiler = req.data.total_Likes.filter((e: any) => {
           return e.users.id === user.id;
         });
-        console.log("likeFiler 있음? :", likeFiler.length > 0);
         setIsLike(likeFiler.length > 0);
       });
     }
   }, []);
   const handleCommentSubmit = () => {
     if (commentContent.length < 2) {
-      return Swal.fire("댓글을 2글자이상 입력하세요");
+      return swal("댓글을 2글자이상 입력하세요");
     } else {
       axios_Create_Comment(postId, commentContent, user.accessToken).then(
         (res) => {
           setCommentContent("");
           axios_Get_DetailPosts(postId).then((req) => {
-            console.log("req:", req.data);
             setPostInfo(req.data);
           });
         }
@@ -358,34 +392,27 @@ export default function Detail() {
     }
   };
   const handleLikeSubmit = () => {
-    console.log("하트 누름");
     axios_Create_Like(postId, user.accessToken)
       .then((res) => {
         setLike("생성");
         axios_Get_DetailPosts(postId).then((req) => {
-          console.log("req:", req.data);
           setPostInfo(req.data);
           let likeFiler = req.data.total_Likes.filter((e: any) => {
             return e.users.id === user.id;
           });
-          console.log("likeFiler 있음? :", likeFiler.length > 0);
           setIsLike(likeFiler.length > 0);
         });
       })
       .catch((err) => {
-        console.log("err  :", err);
         axios_Delete_Like(postId, user.accessToken).then(() => {
           axios_Get_DetailPosts(postId).then((req) => {
-            console.log("req:", req.data);
             setPostInfo(req.data);
             let likeFiler = req.data.total_Likes.filter((e: any) => {
               return e.users.id === user.id;
             });
-            console.log("likeFiler 있음? :", likeFiler.length > 0);
             setIsLike(likeFiler.length > 0);
           });
         });
-        console.log("하트 삭제됨");
         setLike("삭제");
       });
   };
@@ -400,17 +427,15 @@ export default function Detail() {
     formData.append("bodyPart", "상체");
     formData.append("postImage", photo.file[0]);
 
-    console.log("수정 완료 버튼 ");
     axios_Put_Post(formData, postInfo.id, user.accessToken).then(() => {
       axios_Get_DetailPosts(postId)
         .then((req) => {
-          console.log("req:", req.data);
           setPostInfo(req.data);
         })
         .then(() => {
           setIsModify(!isModify);
           setShowDifficult(false);
-          Swal.fire("수정완료 되었습니다");
+          swal("수정완료 되었습니다");
         });
     });
   };
@@ -430,7 +455,6 @@ export default function Detail() {
     setDeleteModal(!deleteModal);
   };
   const handlePostDelete = () => {
-    console.log("포스트삭제");
     axios_Delete_Post(postId, user.accessToken).then(() => {
       navigate("/main");
       // window.location.replace("/main"); // 새로고침후 이동s
@@ -438,16 +462,10 @@ export default function Detail() {
   };
 
   const handleGetbodyPart = (e: any) => {
-    console.log("e.target.value:", e.target.value);
     setBodyPart(e.target.value);
   };
 
   const [showDifficult, setShowDifficult] = useState(false);
-  // console.log("postInfo:", postInfo);
-  // console.log("titleContent:", titleContent);
-  // console.log("isModify: ", isModify);
-  // let shareRecords = postInfo.exerciseInfo.ex_record;
-  // console.log("shareRecords :", shareRecords);
 
   const handlePressEnter = (e: { key: string }) => {
     if (e.key === "Enter") {
@@ -468,17 +486,7 @@ export default function Detail() {
                   onChange={(e) => setTitleContent(e.target.value)}
                 ></input>
               </div>
-              <div className="detail-container-up-up">
-                <div className="detail-userinfo">
-                  <img
-                    className="user-image"
-                    src={postInfo.users.image}
-                    style={{ width: "50px" }}
-                    alt="user"
-                  />
-                  <div className="user-nickname">{postInfo.users.nickname}</div>
-                </div>
-                <div className="detail-button">
+              <div className="detail-button">
                   <button
                     className="edit-success"
                     onClick={handlePostModifySubmit}
@@ -486,21 +494,46 @@ export default function Detail() {
                     수정 완료
                   </button>
                 </div>
+              <div className="detail-container-up-up">
+                <div className="detail-userinfo">
+                <div className="user-image-wrapper">
+                  <img
+                    className="user-image"
+                    src={postInfo.users.image}
+                    alt="user"
+                  />
+                  </div>
+                  <div className="user-nickname">{postInfo.users.nickname}</div>
+                </div>
+                
                 {/* onClick={handlePostModifySubmit} */}
               </div>
               <div className="detail-image">
                 <div className="post-date">
                   {postInfo.created_At.split("T")[0]}
                 </div>
-                <PhotoUploader
+              <div className="post-image">
+              <PhotoUploader
                   photo={photo}
                   setPhoto={setPhoto}
                   photoUrl={postInfo.image}
                 />
               </div>
+              </div>
             </div>
             <div className="detail-container-down">
               <div className="detail-exInfo">
+              <div className="user-exInfo-wrapper">
+                  <div className="user-exInfo">
+                  {postInfo !== null
+                    ? postInfo.exerciseInfo.ex_record.map(
+                        (record: RecordType, idx: number) => (
+                          <CalendarRecord key={idx} record={record} />
+                        )
+                      )
+                    : null}
+                  </div>
+                </div>
                 <div className="exInfo">
                   <div className="exInfo-time-wrapper">
                     <div className="exInfo-time-title">소요시간</div>
@@ -550,17 +583,7 @@ export default function Detail() {
           <Main>
             <div className="detail-container-up">
               <div className="detail-title">{postInfo.title}</div>
-              <div className="detail-container-up-up">
-                <div className="detail-userinfo">
-                  <img
-                    className="user-image"
-                    src={postInfo.users.image}
-                    style={{ width: "50px" }}
-                    alt="user"
-                  />
-                  <div className="user-nickname">{postInfo.users.nickname}</div>
-                </div>
-                {postInfo.users.id === user.id ? (
+              {postInfo.users.id === user.id ? (
                   <div className="detail-button">
                     <div className="edit-button">
                       <i
@@ -578,19 +601,31 @@ export default function Detail() {
                 ) : (
                   <div></div>
                 )}
+              <div className="detail-container-up-up">
+                <div className="detail-userinfo">
+                  <div className="user-image-wrapper">
+                  <img
+                    className="user-image"
+                    src={postInfo.users.image}
+                    alt="user"
+                  />
+                  </div>
+                  <div className="user-nickname">{postInfo.users.nickname}</div>
+                </div>
+                
               </div>
 
               <div className="detail-image">
                 <div className="post-date">
                   {postInfo.created_At.split("T")[0]}
                 </div>
-                <img className="post-image" src={postInfo.image}></img>
+                <img className="post-image" src={postInfo.image} alt="post"/>
               </div>
             </div>
             <div className="detail-container-down">
               <div className="detail-exInfo">
-                {console.log("what doyou have?", postInfo)}
-                <div className="user-exInfo">
+                <div className="user-exInfo-wrapper">
+                  <div className="user-exInfo">
                   {postInfo !== null
                     ? postInfo.exerciseInfo.ex_record.map(
                         (record: RecordType, idx: number) => (
@@ -598,6 +633,7 @@ export default function Detail() {
                         )
                       )
                     : null}
+                  </div>
                 </div>
                 <div className="exInfo">
                   <div className="exInfo-time-wrapper">
@@ -642,6 +678,7 @@ export default function Detail() {
                     />
                   </div>
                 )}
+                좋아요 {postInfo.total_Likes.length}개
               </div>
               <div className="detail-Comment-input">
                 <input
