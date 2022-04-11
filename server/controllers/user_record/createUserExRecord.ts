@@ -26,7 +26,7 @@ module.exports = async (req: Request, res: Response) => {
   const { record } = req.body;
   const date = req.query.date;
   console.log("레큐바디", req.body);
-  console.log("req.cookiess:", req.cookies);
+  console.log("req.cookies:", req.cookies);
 
   //console.log(secToTime(time));
   //   const user = await getRepository(Users).findOne({
